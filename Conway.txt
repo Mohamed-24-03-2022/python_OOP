@@ -1,0 +1,73 @@
+
+1. **Element**:
+    - Méthodes :
+        - `__init__(self, symbol)`
+
+2. **Snake** (subclass of Element):
+    - Méthodes :
+        - `__init__(self)`
+
+3. **Human** (subclass of Element):
+    - Méthodes :
+        - `__init__(self)`
+
+4. **Turmite** (subclass of Element):
+    - Méthodes :
+        - `__init__(self)`
+
+5. **Conway** (subclass of PlanetTk):
+    - Attributs :
+        - `NORTH`, `EAST`, `SOUTH`, `WEST`, `NORTH_EAST`, `SOUTH_EAST`, `SOUTH_WEST`, `NORTH_WEST`, `WIND_ROSE`
+       ` __prev_grid`
+    - Méthodes :
+        - `__init__(self, root, name, lattitude_cells_count, longitude_cells_count, background_color, foreground_color, gridlines_color, cell_size, gutter_size, margin_size, show_content, show_grid_lines, **kw)`
+        - `copy_grid(self)`
+        - `set_prev_grid(self, grid)`
+        - `get_prev_grid(self)`
+        - `populate_random_neighborhood(self)`
+        - `init_population(self)`
+        - `born_on_click(self, cell_number)`
+        - `next_generation(self)`
+        - `update_canvas(self)`
+
+
+*********cahier des charges :
+
+1. **Description générale :**
+   - Le projet consiste en une simulation graphique d'un automate cellulaire basé sur le jeu de la vie de Conway.
+   - L'application utilise la bibliothèque tkinter pour créer une interface graphique.
+   - Les cellules de la grille peuvent être soit de type Humain soit de type Ground
+   - Les cellules peuvent évoluer selon certaines règles prédéfinies.
+
+2. **Fonctionnalités :**
+   - Affichage graphique d'une grille de cellules.
+   - Possibilité de placer des cellules humaines sur la grille en cliquant dessus.
+   - Évolution des cellules selon les règles du jeu de la vie de Conway.
+   - Possibilité de population initiale aléatoire de la grille.
+
+3. **Classes et Modules :**
+   - Le projet est divisé en plusieurs classes :
+     - `Element` : Représente un élément de base.
+     - `PlanetTk` : Classe principale pour la création de la grille et de l'interface graphique.
+     - `Ground`, `Human` : Sous-classes d'`Element` représentant différents types de cellules.
+     - `Conway` : Classe principale pour la simulation du jeu de la vie de Conway.
+
+4. **Interface Utilisateur :**
+   - L'interface utilisateur est basée sur une fenêtre tkinter.
+   - Elle affiche une grille de cellules où chaque cellule peut être d'un type différent.
+   - Possibilité de placer des cellules humaines sur la grille en cliquant dessus
+   - Un bouton "Close" permet de fermer l'application.
+
+5. **Déroulement du Programme :**
+   - Le programme initialise une grille avec une taille spécifiée.
+   - Il génère une population initiale aléatoire de cellules.
+   - Il affiche la grille et commence à évoluer les cellules selon les règles du jeu de la vie de Conway.
+   - L'évolution des cellules est affichée en temps réel sur l'interface graphique chaque 400ms ce qui donne l'impression d'avoir une animation.
+
+6. **Utilisation :**
+   - Le programme peut être exécuté en lançant le fichier principal.
+   - L'utilisateur peut interagir avec la grille en plaçant des cellules humaines et en observant leur évolution.
+
+7. **Améliorations Possibles :**
+   - Amélioration de l'interface utilisateur avec plus d'options de contrôle.
+   - Optimisation des performances pour gérer des grilles de taille plus importante.
