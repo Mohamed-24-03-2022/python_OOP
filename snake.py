@@ -14,7 +14,7 @@ class SnakeGame(PlanetTk):
 
         self.__init_position = (lattitude_cells_count // 2, longitude_cells_count // 2)  # Start in the middle
 
-        self.__current_pos = self.__init_position
+        self.__current_pos = [self.__init_position]
         self.__direction = 'down'
         self.__score = 0
         self.__prev_grid = None
@@ -93,18 +93,30 @@ class SnakeGame(PlanetTk):
             self.set_direction('up')
 
     def move_forward(self):
-        x, y = self.get_current_pos()
-        if self.get_direction() == 'up':
-            self.set_current_pos((x-1, y))
-        elif self.get_direction() == 'down':
-            self.set_current_pos((x+1, y))
-        elif self.get_direction() == 'left':
-            self.set_current_pos((x, y-1))
-        elif self.get_direction() == 'right':
-            self.set_current_pos((x, y+1))
+        current_positions = self.get_current_pos()
+        head_x, head_y = current_positions[0]  # Get the current head position
 
-        self.set_current_pos((self.get_current_pos()[0] % self.get_columns_count(),
-                             self.get_current_pos()[1] % self.get_lines_count()))
+        # Determine the new head position based on the direction
+        if self.get_direction() == 'up':
+            new_head = (head_x - 1, head_y)
+        elif self.get_direction() == 'down':
+            new_head = (head_x + 1, head_y)
+        elif self.get_direction() == 'left':
+            new_head = (head_x, head_y - 1)
+        elif self.get_direction() == 'right':
+            new_head = (head_x, head_y + 1)
+
+        # Apply modulo operation to handle grid boundaries
+        new_head = (new_head[0] % self.get_columns_count(), new_head[1] % self.get_lines_count())
+
+        # Update the snake's positions
+        updated_positions = [new_head]  # Start with the new head position
+
+        # Update the positions for the rest of the snake's body
+        for i in range(1, len(current_positions)):
+            updated_positions.append(current_positions[i-1])  # Append the previous position
+
+        self.set_current_pos(updated_positions)
 
     def clickHandler(self, event):
         if (event.keysym == "Left"):
@@ -115,58 +127,60 @@ class SnakeGame(PlanetTk):
     def step(self):
         self.set_prev_grid(self.copy_grid())
 
-        # Removing the old cell before moving forward
-        x, y = self.get_current_pos()
-        current_cell_number = self.get_cell_number_from_coordinates(x, y)
-        self.set_cell(current_cell_number, EmptyCell())
+        current_positions = self.get_current_pos()
+        for (x, y) in current_positions:
+            cell_number = self.get_cell_number_from_coordinates(x, y)
+            if (self.get_cell(cell_number) == Snake()):
+                cell_number = self.get_cell_number_from_coordinates(x, y)
+                self.set_cell(cell_number, EmptyCell())
 
-        # Moving forward
+        # move forward
         self.move_forward()
 
-        # Adding the new cell after moving forward
-        new_x, new_y = self.get_current_pos()
-        new_cell_number = self.get_cell_number_from_coordinates(new_x, new_y)
+        head_position = self.get_current_pos()[0]
+        head_cell_number = self.get_cell_number_from_coordinates(head_position[0], head_position[1])
+        direction = self.get_direction()
 
-        if self.get_cell(new_cell_number) == Apple():
+        if (self.get_cell(head_cell_number) == Apple()):
             self.update_score(1)
             self.plant_rand_apple()
-            self.set_cell(current_cell_number, Snake())  # Keep the previous tail
+            if (direction == 'up'):
+                self.set_current_pos([(head_position[0]+1, head_position[1])] + self.get_current_pos())
+            elif (direction == 'down'):
+                self.set_current_pos([(head_position[0]-1, head_position[1])] + self.get_current_pos())
+            elif (direction == 'left'):
+                self.set_current_pos([(head_position[0], head_position[1]-1)] + self.get_current_pos())
+            elif (direction == 'right'):
+                self.set_current_pos([(head_position[0], head_position[1]+1)] + self.get_current_pos())
+        elif (self.get_cell(head_cell_number) == Snake()):
+            self.stop()
 
-            # Check if score meets a threshold to increase snake length
-            if self.get_score() % 2 == 0:  # Adjust the threshold as needed
-                # Add a new segment to the snake's body
-                snake_body = self.get_grid_positions(Snake)
-                tail_position = snake_body[-1] if snake_body else self.__current_pos
-                new_tail_position = (tail_position[0] + 1, tail_position[1])  # Example: Extend tail to the right
-                tail_cell_number = self.get_cell_number_from_coordinates(*new_tail_position)
-                self.set_cell(tail_cell_number, Snake())
-
-        elif self.get_cell(new_cell_number) == Snake():
-            self.stop()  # Game over
-
-        self.set_cell(new_cell_number, Snake())
+        new_positions = self.get_current_pos()
+        for (new_x, new_y) in new_positions:
+            new_cell_number = self.get_cell_number_from_coordinates(new_x, new_y)
+            print(new_positions)
+            self.set_cell(new_cell_number, Snake())
 
     def update_canvas(self):
-
         if (self.__is_game):
             self.step()
-
+        # print(self.get_grid())
         for cell_number in range(self.get_cells_count()):
             i, j = self.get_coordinates_from_cell_number(cell_number)
             if (self.get_cell(cell_number) != self.get_prev_grid()[i][j]):
                 cell_type = self.get_cell(cell_number)
-                # color = LangtonAnt.COLORS["turmite"] if cell_type == Turmite() else LangtonAnt.COLORS["empty"]
+                color = 'green' if cell_type == Snake() else 'white'
                 self.itemconfigure(f't_{cell_number}', text=cell_type)
-                # self.itemconfigure(f'c_{cell_number}', fill=color)
+                self.itemconfigure(f'c_{cell_number}', fill=color)
 
-        self.after(100, self.update_canvas)
+        self.after(200, self.update_canvas)
 
 
 if __name__ == '__main__':
     root = tk.Tk()
-    LINES_COUNT = 25
-    COLUMNS_COUNT = 25
-    cell_size = 10
+    LINES_COUNT = 40
+    COLUMNS_COUNT = 40
+    cell_size = 15
     gutter_size = 0
     margin_size = 10
     show_content = True
