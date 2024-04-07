@@ -132,10 +132,8 @@ class Grid:
         La case voisine est alors (ligne + delta_ligne, colonne + delta_colonne).
                 Si 'is_tore' est à 'True' le voisin existe toujours en considérant la grille comme un tore.
                 Si 'is_tore' est à 'False' retourne 'None' lorsque le voisin est hors de la grille."""
-        line_number, column_number = self.get_coordinates_from_cell_number(
-            cell_number)
-        line_number, column_number = line_number + \
-            delta[0], column_number + delta[1]
+        line_number, column_number = self.get_coordinates_from_cell_number(cell_number)
+        line_number, column_number = line_number + delta[0], column_number + delta[1]
         if is_tore or 0 <= line_number < self.__lines_count and 0 <= column_number < self.__columns_count:
             line_number %= self.__lines_count
             column_number %= self.__columns_count

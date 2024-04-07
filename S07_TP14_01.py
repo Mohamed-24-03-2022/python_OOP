@@ -113,6 +113,11 @@ class Snake(Element):
         Element.__init__(self, '\U0001F40D')
 
 
+class Apple(Element):
+    def __init__(self):
+        Element.__init__(self, '\U0001F34E')
+
+
 class Human(Element):
     def __init__(self):
         Element.__init__(self, '\U0001F464')

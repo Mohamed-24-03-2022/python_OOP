@@ -1,12 +1,11 @@
 from S07_TP14_01 import *
 from S08_TP15 import PlanetTk
 import tkinter as tk
-import time
 
 
-class Turmites(PlanetTk):
+class LangtonAnt(PlanetTk):
 
-    COLORS = {"empty": "white", "turmite": "black"}
+    # COLORS = {"empty": "white", "turmite": "black"}
 
     def __init__(self, root, name, lattitude_cells_count, longitude_cells_count, background_color='white', foreground_color='black', gridlines_color='maroon',  cell_size=5, gutter_size=0, margin_size=0, show_content=True, show_grid_lines=True, **kw):
         super().__init__(root, name, lattitude_cells_count, longitude_cells_count, {Turmite, EmptyCell}, EmptyCell(), background_color,
@@ -20,7 +19,7 @@ class Turmites(PlanetTk):
 
         self.init_position()
         self.create_buttons()
-        self.draw(Turmites.COLORS["turmite"])
+        self.draw()
         self.mainloop()
 
     def init_position(self):
@@ -40,13 +39,13 @@ class Turmites(PlanetTk):
             if (self.get_cell(i) != EmptyCell()):
                 self.set_cell(i, EmptyCell())
                 self.itemconfigure(f't_{i}', text=EmptyCell())
-                self.itemconfigure(f'c_{i}', fill='white')
+                # self.itemconfigure(f'c_{i}', fill='white')
         self.set_direction('up')
         self.set_current_pos(self.__init_position)
         init_cell_number = self.get_cell_number_from_coordinates(self.__init_position[0], self.__init_position[1])
         self.set_cell(init_cell_number, Turmite())
         self.itemconfigure(f't_{init_cell_number}', text=Turmite())
-        self.itemconfigure(f'c_{init_cell_number}', fill=Turmites.COLORS["turmite"])
+        # self.itemconfigure(f'c_{init_cell_number}', fill=LangtonAnt.COLORS["turmite"])
 
     def get_current_pos(self):
         return self.__current_pos
@@ -109,16 +108,16 @@ class Turmites(PlanetTk):
     def move_forward(self):
         x, y = self.get_current_pos()
         if self.get_direction() == 'up':
-            self.set_current_pos((x, y - 1))
+            self.set_current_pos((x-1, y))
         elif self.get_direction() == 'down':
-            self.set_current_pos((x, y + 1))
+            self.set_current_pos((x+1, y))
         elif self.get_direction() == 'left':
-            self.set_current_pos((x - 1, y))
+            self.set_current_pos((x, y-1))
         elif self.get_direction() == 'right':
-            self.set_current_pos((x + 1, y))
+            self.set_current_pos((x, y+1))
 
-        self.set_current_pos((self.get_current_pos()[0] % self.get_cells_count(),
-                             self.get_current_pos()[1] % self.get_cells_count()))
+        self.set_current_pos((self.get_current_pos()[0] % self.get_columns_count(),
+                             self.get_current_pos()[1] % self.get_lines_count()))
 
     def step(self):
         # when on a colored cell => turn 90deg left & move forward into a new cell & remove old cell's color
@@ -144,9 +143,9 @@ class Turmites(PlanetTk):
                 i, j = self.get_coordinates_from_cell_number(cell_number)
                 if (self.get_cell(cell_number) != self.get_prev_grid()[i][j]):
                     cell_type = self.get_cell(cell_number)
-                    color = Turmites.COLORS["turmite"] if cell_type == Turmite() else Turmites.COLORS["empty"]
+                    # color = LangtonAnt.COLORS["turmite"] if cell_type == Turmite() else LangtonAnt.COLORS["empty"]
                     self.itemconfigure(f't_{cell_number}', text=cell_type)
-                    self.itemconfigure(f'c_{cell_number}', fill=color)
+                    # self.itemconfigure(f'c_{cell_number}', fill=color)
 
         self.after(100, self.update_canvas)
 
@@ -164,5 +163,5 @@ if __name__ == '__main__':
     foreground_color = 'black'
     gridlines_color = 'black'
 
-    app = Turmites(root, "Turmite", LINES_COUNT, COLUMNS_COUNT, background_color, foreground_color, gridlines_color,
-                   cell_size, gutter_size, margin_size, show_content, show_grid_lines, width=80, height=50)
+    app = LangtonAnt(root, "Turmite", LINES_COUNT, COLUMNS_COUNT, background_color, foreground_color, gridlines_color,
+                     cell_size, gutter_size, margin_size, show_content, show_grid_lines, width=80, height=50)

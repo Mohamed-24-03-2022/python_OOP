@@ -78,7 +78,7 @@ class PlanetTk(PlanetAlpha, tk.Canvas):
             cell_numbers['class_name'].append(cell_number)
         return cell_numbers
 
-    def draw(self, color):
+    def draw(self, color='white'):
         for i in range(self.get_lines_count()):
             y0 = self.__margin_size + i * (self.__cell_size + self.__gutter_size)
             y1 = self.__margin_size + self.__cell_size + i * (self.__cell_size + self.__gutter_size)
