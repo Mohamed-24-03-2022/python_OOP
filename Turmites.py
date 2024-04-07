@@ -13,21 +13,40 @@ class Turmites(PlanetTk):
                          foreground_color, gridlines_color,  cell_size, gutter_size, margin_size, show_content, show_grid_lines, **kw)
 
         self.__init_position = (lattitude_cells_count // 2, longitude_cells_count // 2)  # Start in the middle
-
         self.__current_pos = self.__init_position
         self.__direction = 'up'
-
         self.__prev_grid = None
         self.__is_game = False
 
         self.init_position()
-        self.update_canvas()
+        self.create_buttons()
         self.draw(Turmites.COLORS["turmite"])
         self.mainloop()
 
     def init_position(self):
         init_cell_number = self.get_cell_number_from_coordinates(self.__init_position[0], self.__init_position[1])
-        self.born(init_cell_number, Turmite())
+        self.set_cell(init_cell_number, Turmite())
+
+    def start(self):
+        self.__is_game = True
+        self.update_canvas()
+
+    def stop(self):
+        self.__is_game = False
+
+    def reset(self):
+        self.stop()
+        for i in range(self.get_cells_count()):
+            if (self.get_cell(i) != EmptyCell()):
+                self.set_cell(i, EmptyCell())
+                self.itemconfigure(f't_{i}', text=EmptyCell())
+                self.itemconfigure(f'c_{i}', fill='white')
+        self.set_direction('up')
+        self.set_current_pos(self.__init_position)
+        init_cell_number = self.get_cell_number_from_coordinates(self.__init_position[0], self.__init_position[1])
+        self.set_cell(init_cell_number, Turmite())
+        self.itemconfigure(f't_{init_cell_number}', text=Turmite())
+        self.itemconfigure(f'c_{init_cell_number}', fill=Turmites.COLORS["turmite"])
 
     def get_current_pos(self):
         return self.__current_pos
@@ -50,6 +69,22 @@ class Turmites(PlanetTk):
 
     def get_prev_grid(self):
         return self.__prev_grid
+
+    def create_buttons(self):
+        # Bouton de fermeture
+        self.__b_quit = tk.Button(self.get_root(), text='Close', command=self.quit)
+        self.__b_quit.pack(side=tk.BOTTOM)
+        # Bouton de démarrage
+        btn_frame = tk.Frame(self.get_root())
+        btn_frame.pack(side=tk.BOTTOM)
+        start_button = tk.Button(btn_frame, text="Démarrer", command=self.start)
+        start_button.pack(side=tk.LEFT)
+        # Bouton d'arrêt
+        stop_button = tk.Button(btn_frame, text="Arrêter", command=self.stop)
+        stop_button.pack(side=tk.LEFT)
+        # # Bouton de réinitialisation
+        reset_button = tk.Button(btn_frame, text="Réinitialiser", command=self.reset)
+        reset_button.pack(side=tk.LEFT)
 
     def turn_right(self):
         if self.get_direction() == 'up':
@@ -103,31 +138,23 @@ class Turmites(PlanetTk):
 
     def update_canvas(self):
 
-        # if (self.__is_game):
-        #     self.next_generation()
+        if (self.__is_game):
+            self.step()
+            for cell_number in range(self.get_cells_count()):
+                i, j = self.get_coordinates_from_cell_number(cell_number)
+                if (self.get_cell(cell_number) != self.get_prev_grid()[i][j]):
+                    cell_type = self.get_cell(cell_number)
+                    color = Turmites.COLORS["turmite"] if cell_type == Turmite() else Turmites.COLORS["empty"]
+                    self.itemconfigure(f't_{cell_number}', text=cell_type)
+                    self.itemconfigure(f'c_{cell_number}', fill=color)
 
-        self.step()
-        for cell_number in range(self.get_cells_count()):
-            i, j = self.get_coordinates_from_cell_number(cell_number)
-            if (self.get_cell(cell_number) != self.get_prev_grid()[i][j]):
-                cell_type = self.get_cell(cell_number)
-                color = Turmites.COLORS["turmite"] if cell_type == Turmite() else Turmites.COLORS["empty"]
-                self.itemconfigure(f't_{cell_number}', text=cell_type)
-                self.itemconfigure(f'c_{cell_number}', fill=color)
-
-        self.after(10, self.update_canvas)
-
-
-# difficulties
-# how to modify cells without effecting others (by creating a temp grid each modification)
-# using born method was a mistake as i designed it only for humans (used self.set_cell instead)
-# how to update the canvas after each modification (using self.after)
+        self.after(100, self.update_canvas)
 
 
 if __name__ == '__main__':
     root = tk.Tk()
     LINES_COUNT = 80
-    COLUMNS_COUNT = 120
+    COLUMNS_COUNT = 80
     cell_size = 8
     gutter_size = 0
     margin_size = 10

@@ -1,0 +1,6 @@
+
+# difficulties
+# how to modify cells without effecting others (by creating a temp grid each modification)
+# using born method was a mistake as i designed it only for humans (used self.set_cell instead)
+# how to update the canvas after each modification (using self.after)
+# trying to update only the modified cells to save performances (using a copy of the grid as prev grid)
