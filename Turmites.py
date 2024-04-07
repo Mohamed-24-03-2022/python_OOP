@@ -1,0 +1,141 @@
+from S07_TP14_01 import *
+from S08_TP15 import PlanetTk
+import tkinter as tk
+import time
+
+
+class Turmites(PlanetTk):
+
+    COLORS = {"empty": "white", "turmite": "black"}
+
+    def __init__(self, root, name, lattitude_cells_count, longitude_cells_count, background_color='white', foreground_color='black', gridlines_color='maroon',  cell_size=5, gutter_size=0, margin_size=0, show_content=True, show_grid_lines=True, **kw):
+        super().__init__(root, name, lattitude_cells_count, longitude_cells_count, {Turmite, EmptyCell}, EmptyCell(), background_color,
+                         foreground_color, gridlines_color,  cell_size, gutter_size, margin_size, show_content, show_grid_lines, **kw)
+
+        self.__init_position = (lattitude_cells_count // 2, longitude_cells_count // 2)  # Start in the middle
+
+        self.__current_pos = self.__init_position
+        self.__direction = 'up'
+
+        self.__prev_grid = None
+        self.__is_game = False
+
+        self.init_position()
+        self.update_canvas()
+        self.draw(Turmites.COLORS["turmite"])
+        self.mainloop()
+
+    def init_position(self):
+        init_cell_number = self.get_cell_number_from_coordinates(self.__init_position[0], self.__init_position[1])
+        self.born(init_cell_number, Turmite())
+
+    def get_current_pos(self):
+        return self.__current_pos
+
+    def set_current_pos(self, new_pos):
+        self.__current_pos = new_pos
+
+    def get_direction(self):
+        return self.__direction
+
+    def set_direction(self, direction):
+        self.__direction = direction
+
+    def copy_grid(self):
+        copied_grid = [[cell for cell in row] for row in self.get_grid()]
+        return copied_grid
+
+    def set_prev_grid(self, grid):
+        self.__prev_grid = [[cell for cell in row] for row in grid]
+
+    def get_prev_grid(self):
+        return self.__prev_grid
+
+    def turn_right(self):
+        if self.get_direction() == 'up':
+            self.set_direction('right')
+        elif self.get_direction() == 'right':
+            self.set_direction('down')
+        elif self.get_direction() == 'down':
+            self.set_direction('left')
+        elif self.get_direction() == 'left':
+            self.set_direction('up')
+
+    def turn_left(self):
+        if self.get_direction() == 'up':
+            self.set_direction('left')
+        elif self.get_direction() == 'left':
+            self.set_direction('down')
+        elif self.get_direction() == 'down':
+            self.set_direction('right')
+        elif self.get_direction() == 'right':
+            self.set_direction('up')
+
+    def move_forward(self):
+        x, y = self.get_current_pos()
+        if self.get_direction() == 'up':
+            self.set_current_pos((x, y - 1))
+        elif self.get_direction() == 'down':
+            self.set_current_pos((x, y + 1))
+        elif self.get_direction() == 'left':
+            self.set_current_pos((x - 1, y))
+        elif self.get_direction() == 'right':
+            self.set_current_pos((x + 1, y))
+
+        self.set_current_pos((self.get_current_pos()[0] % self.get_cells_count(),
+                             self.get_current_pos()[1] % self.get_cells_count()))
+
+    def step(self):
+        # when on a colored cell => turn 90deg left & move forward into a new cell & remove old cell's color
+        # when on a white cell => turn 90deg right & move forward into a new cell & color old cell
+        self.set_prev_grid(self.copy_grid())
+        x, y = self.get_current_pos()
+        current_cell_number = self.get_cell_number_from_coordinates(x, y)
+
+        if (self.get_cell(current_cell_number) == Turmite()):
+            self.turn_left()
+            self.move_forward()
+            self.set_cell(current_cell_number, EmptyCell())
+        elif (self.get_cell(current_cell_number) == EmptyCell()):
+            self.turn_right()
+            self.move_forward()
+            self.set_cell(current_cell_number, Turmite())
+
+    def update_canvas(self):
+
+        # if (self.__is_game):
+        #     self.next_generation()
+
+        self.step()
+        for cell_number in range(self.get_cells_count()):
+            i, j = self.get_coordinates_from_cell_number(cell_number)
+            if (self.get_cell(cell_number) != self.get_prev_grid()[i][j]):
+                cell_type = self.get_cell(cell_number)
+                color = Turmites.COLORS["turmite"] if cell_type == Turmite() else Turmites.COLORS["empty"]
+                self.itemconfigure(f't_{cell_number}', text=cell_type)
+                self.itemconfigure(f'c_{cell_number}', fill=color)
+
+        self.after(10, self.update_canvas)
+
+
+# difficulties
+# how to modify cells without effecting others (by creating a temp grid each modification)
+# using born method was a mistake as i designed it only for humans (used self.set_cell instead)
+# how to update the canvas after each modification (using self.after)
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    LINES_COUNT = 80
+    COLUMNS_COUNT = 120
+    cell_size = 8
+    gutter_size = 0
+    margin_size = 10
+    show_content = True
+    show_grid_lines = True
+    background_color = 'white'
+    foreground_color = 'black'
+    gridlines_color = 'black'
+
+    app = Turmites(root, "Turmite", LINES_COUNT, COLUMNS_COUNT, background_color, foreground_color, gridlines_color,
+                   cell_size, gutter_size, margin_size, show_content, show_grid_lines, width=80, height=50)

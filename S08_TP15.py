@@ -5,10 +5,10 @@ from S07_TP14_01 import *
 
 class PlanetTk(PlanetAlpha, tk.Canvas):
 
-    def __init__(self, root, name, lattitude_cells_count, longitude_cells_count, authorized_classes, background_color='white', foreground_color='dark blue', gridlines_color='maroon',  cell_size=40, gutter_size=0, margin_size=0, show_content=True, show_grid_lines=True, **kw):
+    def __init__(self, root, name, lattitude_cells_count, longitude_cells_count, authorized_classes, ground=Ground(), background_color='white', foreground_color='dark blue', gridlines_color='maroon',  cell_size=40, gutter_size=0, margin_size=0, show_content=True, show_grid_lines=True, **kw):
 
         PlanetAlpha.__init__(self, name, lattitude_cells_count,
-                             longitude_cells_count, Ground())
+                             longitude_cells_count, ground)
 
         l = lattitude_cells_count
         c = longitude_cells_count
@@ -78,18 +78,14 @@ class PlanetTk(PlanetAlpha, tk.Canvas):
             cell_numbers['class_name'].append(cell_number)
         return cell_numbers
 
-    def draw(self):
+    def draw(self, color):
         for i in range(self.get_lines_count()):
-            y0 = self.__margin_size + i * \
-                (self.__cell_size + self.__gutter_size)
-            y1 = self.__margin_size + self.__cell_size + \
-                i * (self.__cell_size + self.__gutter_size)
+            y0 = self.__margin_size + i * (self.__cell_size + self.__gutter_size)
+            y1 = self.__margin_size + self.__cell_size + i * (self.__cell_size + self.__gutter_size)
 
             for j in range(self.get_columns_count()):
-                x0 = self.__margin_size + j * \
-                    (self.__cell_size + self.__gutter_size)
-                x1 = self.__margin_size + self.__cell_size + \
-                    j * (self.__cell_size + self.__gutter_size)
+                x0 = self.__margin_size + j * (self.__cell_size + self.__gutter_size)
+                x1 = self.__margin_size + self.__cell_size + j * (self.__cell_size + self.__gutter_size)
 
                 x_center = (x0 + x1) / 2
                 y_center = (y0 + y1) / 2
@@ -102,10 +98,10 @@ class PlanetTk(PlanetAlpha, tk.Canvas):
 
                 self.create_text(x_center, y_center, text=cell_content, tags=(f't_{cell_number}'))
                 self.lift(f't_{cell_number}')
-                self.itemconfigure(f't_{cell_number}', fill="dark blue")
+                self.itemconfigure(f't_{cell_number}', fill="black")
 
                 if (cell_content != self.get_ground()):
-                    self.itemconfigure(f'c_{cell_number}', fill="yellow")
+                    self.itemconfigure(f'c_{cell_number}', fill=color)
 
         self.pack()
 

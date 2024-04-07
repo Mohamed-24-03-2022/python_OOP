@@ -123,6 +123,11 @@ class Turmite(Element):
         Element.__init__(self, '\U0001F7E5')
 
 
+class EmptyCell(Element):
+    def __init__(self):
+        Element.__init__(self, '\u200B')
+
+
 if (__name__ == "__main__"):
     print(Ground(), str(Ground()))
     print(Ground() == str(Ground()))
