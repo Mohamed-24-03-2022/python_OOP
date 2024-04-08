@@ -18,7 +18,7 @@ class Conway(PlanetTk):
                          gridlines_color=gridlines_color, cell_size=cell_size, gutter_size=gutter_size, margin_size=margin_size, show_content=show_content, show_grid_lines=show_grid_lines, **kwargs)
         self.__prev_grid = None
         self.__is_game = False
-
+        self.get_root().title("Conway Game")
         self.init()
         self.create_buttons()
         self.add_click_event()

@@ -17,6 +17,7 @@ class LangtonAnt(PlanetTk):
         self.__prev_grid = None
         self.__is_game = False
 
+        self.get_root().title("Langton's Ant")
         self.init_position()
         self.create_buttons()
         self.draw()

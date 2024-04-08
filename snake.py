@@ -22,7 +22,8 @@ class SnakeGame(PlanetTk):
         self.speed = 200
         self.string_var = tk.StringVar()
 
-        self.get_root().bind('<Key>', self.clickHandler)
+        self.get_root().title("Snake Game")
+        self.add_keyboard_events()
         self.init_position()
         self.start()
         self.create_buttons()
@@ -33,6 +34,9 @@ class SnakeGame(PlanetTk):
         init_cell_number = self.get_cell_number_from_coordinates(self.__init_position[0], self.__init_position[1])
         self.set_cell(init_cell_number, Snake())
         self.plant_rand_apple()
+
+    def add_keyboard_events(self):
+        self.get_root().bind('<Key>', self.clickHandler)
 
     def plant_rand_apple(self):
         empty_cells = self.get_same_value_cell_numbers(EmptyCell())
@@ -56,7 +60,7 @@ class SnakeGame(PlanetTk):
         med_speed_button.pack(side=tk.LEFT)
         high_speed_button = tk.Button(btn_frame, text="vitesse rapide", command=lambda: self.set_speed(50))
         high_speed_button.pack(side=tk.LEFT)
-        # string_variable = tk.StringVar(self.get_root(), f"   Score: {self.get_score()}")
+
         self.string_var.set(f"Score: {self.get_score()}")
         tk.Label(btn_frame, textvariable=self.string_var).pack(side=tk.LEFT)
 
@@ -118,7 +122,7 @@ class SnakeGame(PlanetTk):
         elif self.get_direction() == 'right':
             self.set_direction('up')
 
-    # TODO  simplifie the function
+    # TODO  simplifie THIS function
     def move_forward(self):
         current_positions = self.get_current_pos()
         head_x, head_y = current_positions[0]  # Get the current head position
@@ -190,7 +194,7 @@ class SnakeGame(PlanetTk):
             new_cell_number = self.get_cell_number_from_coordinates(new_x, new_y)
             self.set_cell(new_cell_number, Snake())
 
-    def eat_apple_grow_snake(self):
+    def eat_apple_and_grow_snake(self):
         head_position = self.get_current_pos()[0]
         head_cell_number = self.get_cell_number_from_coordinates(head_position[0], head_position[1])
         direction = self.get_direction()
@@ -222,7 +226,7 @@ class SnakeGame(PlanetTk):
         self.move_forward()
 
         # appending the head position that ate an apple to the snake body's positions
-        self.eat_apple_grow_snake()
+        self.eat_apple_and_grow_snake()
 
         # draw the snake's new positions
         self.draw_new_snake_positions()
