@@ -19,11 +19,13 @@ class SnakeGame(PlanetTk):
         self.__score = 0
         self.__prev_grid = None
         self.__is_game = True
+        self.speed = 200
+        self.string_var = tk.StringVar()
 
-        self.init_position()
         self.get_root().bind('<Key>', self.clickHandler)
-        self.update_canvas()
-        # self.create_buttons()
+        self.init_position()
+        self.start()
+        self.create_buttons()
         self.draw()
         self.mainloop()
 
@@ -37,9 +39,33 @@ class SnakeGame(PlanetTk):
         random_cell_number = random.choice(empty_cells)
         self.set_cell(random_cell_number, Apple())
 
+    def create_buttons(self):
+        # Bouton de fermeture
+        self.__b_quit = tk.Button(self.get_root(), text='Close', command=self.quit)
+        self.__b_quit.pack(side=tk.BOTTOM)
+
+        btn_frame = tk.Frame(self.get_root())
+        btn_frame.pack(side=tk.BOTTOM)
+        start_button = tk.Button(btn_frame, text="Démarrer", command=self.start)
+        start_button.pack(side=tk.LEFT)
+        stop_button = tk.Button(btn_frame, text="Arrêter", command=self.stop)
+        stop_button.pack(side=tk.LEFT)
+        slow_speed_button = tk.Button(btn_frame, text="vitesse lente", command=lambda: self.set_speed(200))
+        slow_speed_button.pack(side=tk.LEFT)
+        med_speed_button = tk.Button(btn_frame, text="vitesse moyenne", command=lambda: self.set_speed(100))
+        med_speed_button.pack(side=tk.LEFT)
+        high_speed_button = tk.Button(btn_frame, text="vitesse rapide", command=lambda: self.set_speed(50))
+        high_speed_button.pack(side=tk.LEFT)
+        # string_variable = tk.StringVar(self.get_root(), f"   Score: {self.get_score()}")
+        self.string_var.set(f"Score: {self.get_score()}")
+        tk.Label(btn_frame, textvariable=self.string_var).pack(side=tk.LEFT)
+
+    def set_speed(self, speed):
+        self.speed = speed
+
     def start(self):
         self.__is_game = True
-        # self.update_canvas()
+        self.update_canvas()
 
     def stop(self):
         self.__is_game = False
@@ -92,6 +118,7 @@ class SnakeGame(PlanetTk):
         elif self.get_direction() == 'right':
             self.set_direction('up')
 
+    # TODO  simplifie the function
     def move_forward(self):
         current_positions = self.get_current_pos()
         head_x, head_y = current_positions[0]  # Get the current head position
@@ -106,7 +133,6 @@ class SnakeGame(PlanetTk):
         elif self.get_direction() == 'right':
             new_head = (head_x, head_y + 1)
 
-        # Apply modulo operation to handle grid boundaries
         new_head = (new_head[0] % self.get_columns_count(), new_head[1] % self.get_lines_count())
 
         # Update the snake's positions
@@ -124,25 +150,55 @@ class SnakeGame(PlanetTk):
         elif (event.keysym == "Right"):
             self.turn_right()
 
-    def step(self):
-        self.set_prev_grid(self.copy_grid())
+    def check_death(self, current_positions):
+        next_head_position = current_positions[0]
+        direction = self.get_direction()
+        l, c = self.get_lines_count(), self.get_columns_count()
+        # here i predict the next head position based on the current direction
+        # then i check if the next head position is a snake's position
 
-        current_positions = self.get_current_pos()
+        next_head_cell_number = self.get_cell_number_from_coordinates(
+            (next_head_position[0]-2) % l, next_head_position[1])
+        if (direction == 'up' and self.get_cell(next_head_cell_number) == Snake()):
+            self.stop()
+
+        next_head_cell_number = self.get_cell_number_from_coordinates(
+            (next_head_position[0]+2) % l, next_head_position[1])
+        if (direction == 'down' and self.get_cell(next_head_cell_number) == Snake()):
+            self.stop()
+
+        next_head_cell_number = self.get_cell_number_from_coordinates(
+            next_head_position[0], (next_head_position[1]-2) % c)
+        if (direction == 'left' and self.get_cell(next_head_cell_number) == Snake()):
+            self.stop()
+
+        next_head_cell_number = self.get_cell_number_from_coordinates(
+            next_head_position[0], (next_head_position[1]+2) % c)
+        if (direction == 'right' and self.get_cell(next_head_cell_number) == Snake()):
+            self.stop()
+
+    def remove_snake_from_grid(self, current_positions):
         for (x, y) in current_positions:
             cell_number = self.get_cell_number_from_coordinates(x, y)
             if (self.get_cell(cell_number) == Snake()):
                 cell_number = self.get_cell_number_from_coordinates(x, y)
                 self.set_cell(cell_number, EmptyCell())
 
-        # move forward
-        self.move_forward()
+    def draw_new_snake_positions(self):
+        new_positions = self.get_current_pos()
+        for (new_x, new_y) in new_positions:
+            new_cell_number = self.get_cell_number_from_coordinates(new_x, new_y)
+            self.set_cell(new_cell_number, Snake())
 
+    def eat_apple_grow_snake(self):
         head_position = self.get_current_pos()[0]
         head_cell_number = self.get_cell_number_from_coordinates(head_position[0], head_position[1])
         direction = self.get_direction()
 
         if (self.get_cell(head_cell_number) == Apple()):
             self.update_score(1)
+            self.string_var.set(f"Score: {self.get_score()}")
+
             self.plant_rand_apple()
             if (direction == 'up'):
                 self.set_current_pos([(head_position[0]+1, head_position[1])] + self.get_current_pos())
@@ -152,35 +208,49 @@ class SnakeGame(PlanetTk):
                 self.set_current_pos([(head_position[0], head_position[1]-1)] + self.get_current_pos())
             elif (direction == 'right'):
                 self.set_current_pos([(head_position[0], head_position[1]+1)] + self.get_current_pos())
-        elif (self.get_cell(head_cell_number) == Snake()):
-            self.stop()
 
-        new_positions = self.get_current_pos()
-        for (new_x, new_y) in new_positions:
-            new_cell_number = self.get_cell_number_from_coordinates(new_x, new_y)
-            print(new_positions)
-            self.set_cell(new_cell_number, Snake())
+    def step(self):
+        self.set_prev_grid(self.copy_grid())
+
+        current_positions = self.get_current_pos()
+
+        self.check_death(current_positions)
+
+        # remove old snake's positions from the grid
+        self.remove_snake_from_grid(current_positions)
+
+        self.move_forward()
+
+        # appending the head position that ate an apple to the snake body's positions
+        self.eat_apple_grow_snake()
+
+        # draw the snake's new positions
+        self.draw_new_snake_positions()
 
     def update_canvas(self):
         if (self.__is_game):
             self.step()
-        # print(self.get_grid())
+
         for cell_number in range(self.get_cells_count()):
             i, j = self.get_coordinates_from_cell_number(cell_number)
+            if (self.get_cell(cell_number) == Apple()):
+                self.itemconfigure(f'c_{cell_number}', fill='red')
+
             if (self.get_cell(cell_number) != self.get_prev_grid()[i][j]):
                 cell_type = self.get_cell(cell_number)
-                color = 'green' if cell_type == Snake() else 'white'
+                color = 'green' if (cell_type == Snake()) else 'white'
+
                 self.itemconfigure(f't_{cell_number}', text=cell_type)
                 self.itemconfigure(f'c_{cell_number}', fill=color)
 
-        self.after(200, self.update_canvas)
+        self.after(self.speed, self.update_canvas)
 
 
 if __name__ == '__main__':
     root = tk.Tk()
-    LINES_COUNT = 40
-    COLUMNS_COUNT = 40
-    cell_size = 15
+    LINES_COUNT = 30
+    COLUMNS_COUNT = 30
+    cell_size = 20
     gutter_size = 0
     margin_size = 10
     show_content = True
