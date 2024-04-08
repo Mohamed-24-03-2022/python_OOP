@@ -188,7 +188,7 @@ class SnakeGame(PlanetTk):
                 cell_number = self.get_cell_number_from_coordinates(x, y)
                 self.set_cell(cell_number, EmptyCell())
 
-    def draw_new_snake_positions(self):
+    def set_new_snake_positions(self):
         new_positions = self.get_current_pos()
         for (new_x, new_y) in new_positions:
             new_cell_number = self.get_cell_number_from_coordinates(new_x, new_y)
@@ -229,7 +229,7 @@ class SnakeGame(PlanetTk):
         self.eat_apple_and_grow_snake()
 
         # draw the snake's new positions
-        self.draw_new_snake_positions()
+        self.set_new_snake_positions()
 
     def update_canvas(self):
         if (self.__is_game):

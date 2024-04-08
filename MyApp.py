@@ -60,9 +60,7 @@ class MyApp(tk.Tk):
         tk.Button(self, text='Conway game', command=self.openConway).pack(side=tk.LEFT)
         tk.Button(self, text='LangtonAnt game', command=self.openLangtonAnt).pack(side=tk.LEFT)
         tk.Button(self, text='Snake game', command=self.openSnakeGame).pack(side=tk.LEFT)
-        fr = tk.Frame(self)
-        fr.pack(side=tk.BOTTOM)
-        tk.Button(fr, text='Quit', command=self.quit).pack(side=tk.LEFT)
+        tk.Button(self, text='Quit', command=self.quit).pack(side=tk.LEFT)
 
     def openConway(self):
         self.destroy()

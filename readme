@@ -1,7 +1,23 @@
+1. Ensure you have Python installed on your computer. If not, download and install Python from [python.org](https://www.python.org/).
 
-# difficulties
-# how to modify cells without effecting others (by creating a temp grid each modification)
-# using born method was a mistake as i designed it only for humans (used self.set_cell instead)
-# how to update the canvas after each modification (using self.after)
-# trying to update only the modified cells to save performances (using a copy of the grid as prev grid)
-# snake length management, and snake specific mouvement
+2. Clone or download this repository to your local machine.
+
+3. Navigate to the directory containing the project files.
+
+4. Open a terminal or command prompt in that directory.
+
+5. Run the application by executing the following command:
+
+   ```
+   python MyApp.py
+   ```
+
+6. After running `MyApp.py`, a graphical interface will appear displaying three games.
+
+7. Choose one of the following games from the graphical interface:
+
+   - **Conway's Game of Life**
+   - **Langton's Ant**
+   - **Snake**
+
+8. Click on the desired game to launch and start playing.
